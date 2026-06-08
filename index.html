@@ -479,6 +479,8 @@
     function speakGreeting() {
         if (greetingDone || !window.speechSynthesis) return;
         greetingDone = true;
+        document.removeEventListener('click', speakGreeting);
+        document.removeEventListener('keydown', speakGreeting);
         window.speechSynthesis.cancel();
         var msg = new SpeechSynthesisUtterance(
             'Hi Kiran, how are you? I am PlantAI, your smart plant disease detection assistant. I can help you identify 58 types of plant diseases across 14 crops instantly, check image quality, calculate infection severity, and generate professional PDF treatment reports. My key advantages include lightweight offline-ready models, custom local treatment suggestions, and localized multi-lingual support. Let us get started!'
@@ -501,6 +503,8 @@
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
         window.speechSynthesis.onvoiceschanged = speakGreeting;
     }
+    document.addEventListener('click', speakGreeting);
+    document.addEventListener('keydown', speakGreeting);
 })();
 </script>
 </body>
