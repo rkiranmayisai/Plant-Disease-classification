@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlantAI - Analyze Plant Leaf Disease | Crop Health Diagnostics</title>
+  <meta name="description" content="Upload a leaf photo to diagnose plant diseases, assess severity, get treatment suggestions, and download PDF reports." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="detect.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<canvas id="particleCanvas" class="particle-bg"></canvas>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🌿</div>
+      <span class="brand-name">Plant<span class="brand-accent">AI</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="detect.html" class="nav-link active">Detect Disease</a>
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="map.html" class="nav-link">Disease Map</a>
+      <a href="chatbot.html" class="nav-link">AI Assistant</a>
+      <a href="auth.html" class="nav-link nav-btn-login" id="authNavBtn">Login</a>
+    </div>
+    <div class="nav-actions">
+      <button class="lang-toggle" id="langToggle">🌐 EN</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="detect-wrapper">
+  <div class="detect-container">
+    
+    <!-- LEFT SIDE: Upload & Diagnostic Flow -->
+    <div class="diagnostic-panel glass">
+      <div class="panel-header">
+        <h2>🔬 Crop Health Diagnostic Laboratory</h2>
+        <p>Ensure the leaf fills the camera view, is in focus, and has good lighting.</p>
+      </div>
+
+      <!-- Crop Selector (Optional override) -->
+      <div class="crop-select-row">
+        <label>Crop Type (Optional):</label>
+        <select id="cropSelect">
+          <option value="auto">🔍 Auto-Detect Crop</option>
+          <option value="tomato">🍅 Tomato</option>
+          <option value="potato">🥔 Potato</option>
+          <option value="corn">🌽 Corn</option>
+          <option value="wheat">🌾 Wheat</option>
+          <option value="pepper">🌶️ Pepper</option>
+        </select>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*" class="hidden" />
+        <div class="upload-idle" id="uploadIdle">
+          <div class="upload-icon">📸</div>
+          <h3>Drag & drop your leaf photo</h3>
+          <p>or click to select from files</p>
+          <div class="upload-btn">Browse Files</div>
+          <p class="file-limits">Supports JPG, PNG, WebP (Max 10MB)</p>
+        </div>
+        <div class="upload-preview-container hidden" id="previewContainer">
+          <img id="imagePreview" alt="Uploaded plant leaf" />
+          <canvas id="analysisCanvas" class="hidden"></canvas>
+          <button class="btn-remove-img" id="btnRemoveImg">✕ Remove</button>
+        </div>
+      </div>
+
+      <!-- Action Row -->
+      <div class="action-row">
+        <button class="btn-primary" id="btnAnalyze" disabled>
+          <span>🔬</span> Run Diagnostic Scan
+        </button>
+      </div>
+
+      <!-- Image Quality Panel -->
+      <div class="quality-panel hidden" id="qualityPanel">
+        <h4 class="q-title">📋 Smart Image Quality Assessment</h4>
+        <div class="quality-metrics">
+          <div class="metric-item">
+            <span class="m-label">Lighting Brightness:</span>
+            <span class="m-value" id="valBrightness">--</span>
+          </div>
+          <div class="metric-item">
+            <span class="m-label">Leaf Presence Coverage:</span>
+            <span class="m-value" id="valCoverage">--</span>
+          </div>
+          <div class="metric-item">
+            <span class="m-label">Status:</span>
+            <span class="m-value font-bold" id="valStatus">--</span>
+          </div>
+        </div>
+        <div class="quality-warnings hidden" id="qualityWarnings"></div>
+      </div>
+
+      <!-- Analyzing State overlay -->
+      <div class="analysis-overlay hidden" id="analysisOverlay">
+        <div class="scanner-wrap">
+          <div class="scan-bar"></div>
+          <img id="scanningImage" src="" alt="Scanning" />
+        </div>
+        <div class="scanning-info">
+          <h3 id="scanningStep">Segmenting Leaf Pixels...</h3>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+          </div>
+          <p class="scanning-sub">PlantAI Deep Learning Engine v3.2</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Diagnostic Results -->
+    <div class="results-panel glass" id="resultsPanel">
+      <div class="results-empty" id="resultsEmpty">
+        <div class="empty-icon">📊</div>
+        <h3>No Diagnosis Yet</h3>
+        <p>Upload a leaf image and click "Run Diagnostic Scan" to see the analysis, severity breakdown, and customized treatments.</p>
+      </div>
+
+      <div class="results-content hidden" id="resultsContent">
+        
+        <!-- Tab Selectors for Results page -->
+        <div class="results-tabs">
+          <button class="res-tab active" data-tab="diagnosis">🔬 Diagnosis</button>
+          <button class="res-tab" data-tab="treatments">💊 Treatments</button>
+          <button class="res-tab" data-tab="severity">📐 Severity & Loss</button>
+        </div>
+
+        <!-- TAB 1: DIAGNOSIS -->
+        <div class="tab-pane active" id="paneDiagnosis">
+          <div class="result-headline">
+            <div class="res-crop-badge" id="resCropBadge">🍅 Tomato</div>
+            <h1 id="resDiseaseName">Early Blight</h1>
+            <div class="res-meta-row">
+              <span id="resConfidence">92% Confidence</span>
+              <span class="dot-divider">•</span>
+              <span id="resRiskLevel" class="risk-badge critical">Critical Risk</span>
+            </div>
+            <p class="res-desc" id="resDescription">Caused by Alternaria solani fungus. Appears as brown spots with concentric rings.</p>
+          </div>
+
+          <div class="chart-section">
+            <h4>📊 AI Confidence Distribution</h4>
+            <div class="confidence-bars" id="confidenceBars">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+
+          <div class="symptoms-section">
+            <h4>⚠️ Key Symptoms Identified</h4>
+            <ul class="bullet-list" id="symptomsList">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- TAB 2: TREATMENTS -->
+        <div class="tab-pane" id="paneTreatments">
+          <div class="treatment-block">
+            <h3 class="t-type-header green-glow">🌿 Organic Treatment Protocol</h3>
+            <div class="treatment-cards" id="organicTreatments">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <div class="treatment-block">
+            <h3 class="t-type-header amber-glow">🧪 Chemical Control Measures</h3>
+            <div class="treatment-cards" id="chemicalTreatments">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: SEVERITY & CROP LOSS -->
+        <div class="tab-pane" id="paneSeverity">
+          <div class="severity-grid">
+            
+            <div class="severity-card">
+              <h4>📐 Leaf Severity Index</h4>
+              <div class="gauge-container">
+                <svg viewBox="0 0 100 50" class="gauge">
+                  <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2a3b5c" stroke-width="10" stroke-linecap="round" />
+                  <path d="M 10 50 A 40 40 0 0 1 90 50" id="gaugeFill" fill="none" stroke="var(--primary)" stroke-width="10" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" />
+                </svg>
+                <div class="gauge-value" id="gaugeValText">0%</div>
+              </div>
+              <p class="severity-info text-center" id="severityStatus">Mild Infection</p>
+            </div>
+
+            <div class="severity-card">
+              <h4>📈 Projected Yield Impact</h4>
+              <div class="yield-loss-value" id="yieldLossVal">0%</div>
+              <p class="yield-loss-sub text-center">Estimated Crop Yield Loss if left untreated</p>
+              <div class="progress-bar-container" style="margin-top: 1rem;">
+                <div class="progress-bar-fill bg-danger" id="yieldLossProgress" style="width: 0%;"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Disease Outbreak Prevention Notice -->
+          <div class="outbreak-notice glass">
+            <h4>🔥 Regional Weather Risk Adjustment</h4>
+            <p id="weatherRiskText">Current weather parameters match favorable incubation temperature for this disease. Risk index upgraded.</p>
+          </div>
+        </div>
+
+        <!-- PDF Export & Share -->
+        <div class="results-actions">
+          <button class="btn-primary" id="btnDownloadPDF">
+            <span>📄</span> Download Diagnostic PDF Report
+          </button>
+          <button class="btn-secondary" id="btnShareReport">
+            <span>🔗</span> Share Report
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="nav-brand">
+        <div class="brand-icon">🌿</div>
+        <span class="brand-name">Plant<span class="brand-accent">AI</span></span>
+      </div>
+      <p>Empowering farmers with AI-powered plant disease detection and crop health insights.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast Notifications Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- Chatbot Widget -->
+<div class="chatbot-widget" id="chatbotWidget">
+  <div class="chatbot-bubble" id="chatbotBubble">
+    <span>🤖</span>
+    <div class="chatbot-tooltip">Ask me about plant diseases!</div>
+  </div>
+  <div class="chatbot-panel" id="chatbotPanel">
+    <div class="chatbot-header">
+      <div class="chatbot-avatar">🌿</div>
+      <div>
+        <div class="chatbot-title">PlantAI Assistant</div>
+        <div class="chatbot-status">● Online</div>
+      </div>
+      <button class="chatbot-close" id="chatbotClose">✕</button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="chat-msg bot">
+        <div class="chat-bubble">Hi! I'm PlantAI Assistant 🌱 Ask me anything about plant diseases, treatments, or farming!</div>
+      </div>
+    </div>
+    <div class="chatbot-input-area">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Ask about any plant disease..." />
+      <button class="chat-send" id="chatSend">→</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="particles.js"></script>
+<script src="lang.js"></script>
+<script src="chatbot.js"></script>
+<script src="detect.js"></script>
+</body>
+</html>

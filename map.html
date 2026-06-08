@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlantAI - Live Crop Disease Outbreak Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="map.css" />
+</head>
+<body>
+
+<canvas id="particleCanvas" class="particle-bg"></canvas>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🌿</div>
+      <span class="brand-name">Plant<span class="brand-accent">AI</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="detect.html" class="nav-link">Detect Disease</a>
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="map.html" class="nav-link active">Disease Map</a>
+      <a href="chatbot.html" class="nav-link">AI Assistant</a>
+      <a href="auth.html" class="nav-link nav-btn-login" id="authNavBtn">Login</a>
+    </div>
+    <div class="nav-actions">
+      <button class="lang-toggle" id="langToggle">🌐 EN</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="map-wrapper">
+  <div class="map-container">
+    
+    <!-- LEFT PANEL: Filters and Outbreak Alert List -->
+    <div class="map-control-panel glass">
+      <div class="mcp-header">
+        <h2>🗺️ Regional Disease Map</h2>
+        <p>Real-time geographic tracking of agricultural crop outbreaks.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="map-filters">
+        <div class="filter-group">
+          <label>Filter by Crop:</label>
+          <select id="mapCropFilter">
+            <option value="all">All Crops</option>
+            <option value="tomato">Tomato</option>
+            <option value="potato">Potato</option>
+            <option value="corn">Corn</option>
+            <option value="wheat">Wheat</option>
+            <option value="pepper">Pepper</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Risk Threshold:</label>
+          <select id="mapSeverityFilter">
+            <option value="all">All Severities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High & Above</option>
+            <option value="medium">Medium & Above</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Alert Feed -->
+      <div class="alert-feed-wrapper">
+        <h4>🚨 Live Regional Outbreak Alerts</h4>
+        <div class="alert-feed" id="alertFeed">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Interactive Outbreak Plotting Map & Weather risk tool -->
+    <div class="map-visual-panel">
+      
+      <!-- Vector Map Canvas Mock -->
+      <div class="visual-canvas glass" id="mapCanvas">
+        <div class="canvas-header">
+          <span>📍 Outbreak Plotter (India Grid)</span>
+          <span class="legend-badges">
+            <span class="legend-badge critical">Critical</span>
+            <span class="legend-badge high">High</span>
+            <span class="legend-badge medium">Medium</span>
+          </span>
+        </div>
+        
+        <!-- Interactive plotting area -->
+        <div class="map-plot-area" id="mapPlotArea">
+          <!-- Dot markers will be placed here -->
+        </div>
+
+        <!-- Hover info popup overlay -->
+        <div class="map-popup hidden" id="mapPopup">
+          <h4 id="popupLocation">Bangalore, KA</h4>
+          <p id="popupDisease">Tomato Late Blight</p>
+          <div class="popup-meta">
+            <span class="popup-badge" id="popupSeverity">Critical</span>
+            <span id="popupReports">89 Reports</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weather Risk Enhancement Matrix Calculator -->
+      <div class="weather-matrix-tool glass">
+        <h3>🌤️ Weather-Based Risk Predictor</h3>
+        <p class="tool-sub">Enter local climatic metrics to predict the risk index of disease outbreak incubation.</p>
+        
+        <div class="matrix-inputs">
+          <div class="matrix-in-group">
+            <label>Temperature (°C)</label>
+            <input type="number" id="wTemp" value="26" min="-10" max="50" />
+          </div>
+          <div class="matrix-in-group">
+            <label>Relative Humidity (%)</label>
+            <input type="number" id="wHumid" value="88" min="0" max="100" />
+          </div>
+          <div class="matrix-in-group">
+            <label>Avg Rainfall (mm)</label>
+            <input type="number" id="wRain" value="12" min="0" max="200" />
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btnPredictRisk" style="margin-top: 1rem; width: 100%;">
+          Calculate Vulnerability Index
+        </button>
+
+        <div class="risk-result-box hidden" id="riskResultBox">
+          <div class="rrb-header">
+            <span>Result:</span>
+            <span class="rrb-badge" id="rrbRiskBadge">High Risk</span>
+          </div>
+          <p id="rrbRiskExplanation">Conditions match Late Blight incubation parameters. Preventive fungicide sprays highly recommended.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast Notifications Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- Chatbot Widget -->
+<div class="chatbot-widget" id="chatbotWidget">
+  <div class="chatbot-bubble" id="chatbotBubble">
+    <span>🤖</span>
+    <div class="chatbot-tooltip">Ask me about plant diseases!</div>
+  </div>
+  <div class="chatbot-panel" id="chatbotPanel">
+    <div class="chatbot-header">
+      <div class="chatbot-avatar">🌿</div>
+      <div>
+        <div class="chatbot-title">PlantAI Assistant</div>
+        <div class="chatbot-status">● Online</div>
+      </div>
+      <button class="chatbot-close" id="chatbotClose">✕</button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="chat-msg bot">
+        <div class="chat-bubble">Hi! I'm PlantAI Assistant 🌱 Ask me anything about plant diseases, treatments, or farming!</div>
+      </div>
+    </div>
+    <div class="chatbot-input-area">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Ask about any plant disease..." />
+      <button class="chat-send" id="chatSend">→</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="particles.js"></script>
+<script src="lang.js"></script>
+<script src="chatbot.js"></script>
+<script src="map.js"></script>
+</body>
+</html>
