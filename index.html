@@ -471,5 +471,37 @@
 <script src="lang.js"></script>
 <script src="chatbot.js"></script>
 <script src="home.js"></script>
+
+<!-- PlantAI Voice Greeting -->
+<script>
+(function() {
+    var greetingDone = false;
+    function speakGreeting() {
+        if (greetingDone || !window.speechSynthesis) return;
+        greetingDone = true;
+        window.speechSynthesis.cancel();
+        var msg = new SpeechSynthesisUtterance(
+            'Hi Kiran, how are you? I am PlantAI, your smart plant disease detection assistant. I can help you identify 58 types of plant diseases across 14 crops instantly, check image quality, calculate infection severity, and generate professional PDF treatment reports. My key advantages include lightweight offline-ready models, custom local treatment suggestions, and localized multi-lingual support. Let us get started!'
+        );
+        msg.rate = 0.95;
+        msg.pitch = 1.05;
+        msg.volume = 1;
+        var voices = window.speechSynthesis.getVoices();
+        var preferred = voices.find(function(v){ return v.lang === 'en-US' && v.name.toLowerCase().includes('female'); }) ||
+                        voices.find(function(v){ return v.lang === 'en-US'; }) ||
+                        voices[0];
+        if (preferred) msg.voice = preferred;
+        window.speechSynthesis.speak(msg);
+    }
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(speakGreeting, 1200);
+    } else {
+        window.addEventListener('DOMContentLoaded', function(){ setTimeout(speakGreeting, 1200); });
+    }
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = speakGreeting;
+    }
+})();
+</script>
 </body>
 </html>
