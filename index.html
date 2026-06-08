@@ -472,24 +472,310 @@
 <script src="chatbot.js"></script>
 <script src="home.js"></script>
 
-<!-- PlantAI Voice Greeting -->
+<!-- ===== PREMIUM AI VOICE GREETING WIDGET ===== -->
+<div id="ai-voice-toast">
+  <div class="ai-voice-toast-content">
+    <div class="ai-voice-toast-header">
+      <span class="ai-voice-avatar">🌿</span>
+      <div class="ai-voice-toast-text">
+        <h4 class="ai-voice-title">PlantAI Voice Assistant</h4>
+        <p class="ai-voice-subtitle">Tap to hear my introduction!</p>
+      </div>
+      <button class="ai-voice-close-btn" id="ai-voice-close" title="Dismiss">✕</button>
+    </div>
+    <div class="ai-voice-wave-container hidden" id="ai-voice-wave">
+      <span class="ai-voice-bar"></span>
+      <span class="ai-voice-bar"></span>
+      <span class="ai-voice-bar"></span>
+      <span class="ai-voice-bar"></span>
+    </div>
+    <div class="ai-voice-toast-actions">
+      <button class="ai-voice-btn-primary" id="ai-voice-play">
+        <span class="btn-icon">🔊</span> Listen Now
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* CSS for the Premium Voice Greeting Widget */
+#ai-voice-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  max-width: 340px;
+  width: calc(100% - 48px);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  pointer-events: none;
+}
+#ai-voice-toast.ai-voice-toast-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.ai-voice-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ai-voice-toast-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+.ai-voice-avatar {
+  font-size: 20px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+  animation: pulse-glow-green 2s infinite ease-in-out;
+}
+@keyframes pulse-glow-green {
+  0%, 100% { box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
+}
+.ai-voice-toast-text {
+  flex: 1;
+}
+.ai-voice-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.ai-voice-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.ai-voice-close-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  transition: color 0.2s;
+  position: absolute;
+  top: -4px;
+  right: -4px;
+}
+.ai-voice-close-btn:hover {
+  color: #cbd5e1;
+}
+.ai-voice-toast-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.ai-voice-btn-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+.ai-voice-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+.ai-voice-btn-primary:active {
+  transform: translateY(0);
+}
+/* Equalizer Animation */
+.ai-voice-wave-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 20px;
+  margin: 4px auto;
+}
+.ai-voice-bar {
+  width: 4px;
+  height: 100%;
+  background: #10b981;
+  border-radius: 2px;
+  animation: bounce 0.8s ease-in-out infinite alternate;
+}
+.ai-voice-bar:nth-child(2) {
+  background: #34d399;
+  animation-delay: 0.15s;
+}
+.ai-voice-bar:nth-child(3) {
+  background: #6ee7b7;
+  animation-delay: 0.3s;
+}
+.ai-voice-bar:nth-child(4) {
+  background: #a7f3d0;
+  animation-delay: 0.45s;
+}
+@keyframes bounce {
+  10% { height: 30%; }
+  100% { height: 100%; }
+}
+</style>
+
 <script>
 (function() {
     var greetingDone = false;
-    function speakGreeting() {
-        if (greetingDone || !window.speechSynthesis) return;
-        greetingDone = true;
-        window.speechSynthesis.cancel();
-        var msg = new SpeechSynthesisUtterance(
-            'Hi Kiran, how are you? I am PlantAI, your smart plant disease detection assistant. I can help you identify 58 types of plant diseases across 14 crops instantly, check image quality, calculate infection severity, and generate professional PDF treatment reports. My key advantages include lightweight offline-ready models, custom local treatment suggestions, and localized multi-lingual support. Let us get started!'
-        );
-        msg.rate = 0.95;
-        msg.pitch = 1.05;
-        msg.volume = 1;
-        window.speechSynthesis.speak(msg);
+    var activeUtterances = []; // Prevent Garbage Collection
+    var textToSpeak = 'Hi Kiran, how are you? I am PlantAI, your smart plant disease detection assistant. I can help you identify 58 types of plant diseases across 14 crops instantly, check image quality, calculate infection severity, and generate professional PDF treatment reports. My key advantages include lightweight offline-ready models, custom local treatment suggestions, and localized multi-lingual support. Let us get started!';
+    
+    function initVoice() {
+        var toast = document.getElementById('ai-voice-toast');
+        var playBtn = document.getElementById('ai-voice-play');
+        var closeBtn = document.getElementById('ai-voice-close');
+        var wave = document.getElementById('ai-voice-wave');
+        
+        if (!toast || !playBtn || !closeBtn || !wave) return;
+        
+        // Don't play if already played in this session
+        if (sessionStorage.getItem('plantAiVoiceGreetingPlayed')) {
+            toast.style.display = 'none';
+            return;
+        }
+        
+        // Show toast after 1.5s delay
+        setTimeout(function() {
+            if (!greetingDone) {
+                toast.classList.add('ai-voice-toast-visible');
+            }
+        }, 1500);
+        
+        function handleSpeech() {
+            if (greetingDone) return;
+            greetingDone = true;
+            sessionStorage.setItem('plantAiVoiceGreetingPlayed', 'true');
+            
+            // Clean up general page event listeners
+            document.removeEventListener('click', handleSpeech);
+            document.removeEventListener('keydown', handleSpeech);
+            
+            if (!window.speechSynthesis) {
+                dismissToast();
+                return;
+            }
+            
+            // Un-pause and reset speech queue (known Chrome bugs)
+            try {
+                if (window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                }
+                window.speechSynthesis.cancel();
+            } catch(e) {
+                console.error("Speech reset failed:", e);
+            }
+            
+            var msg = new SpeechSynthesisUtterance(textToSpeak);
+            
+            // Try to find a nice English voice
+            var voices = window.speechSynthesis.getVoices();
+            if (voices && voices.length > 0) {
+                var preferredVoice = voices.find(function(v) {
+                    return v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Zira') || v.name.includes('David'));
+                }) || voices.find(function(v) {
+                    return v.lang.startsWith('en');
+                });
+                if (preferredVoice) {
+                    msg.voice = preferredVoice;
+                }
+            }
+            
+            msg.rate = 0.95;
+            msg.pitch = 1.05;
+            msg.volume = 1;
+            
+            // UI updates
+            playBtn.classList.add('hidden');
+            wave.classList.remove('hidden');
+            document.querySelector('.ai-voice-subtitle').textContent = 'AI is speaking...';
+            
+            // Event Handlers
+            msg.onend = function() {
+                dismissToast();
+                activeUtterances = [];
+            };
+            
+            msg.onerror = function(e) {
+                console.error("Speech synthesis error:", e);
+                dismissToast();
+                activeUtterances = [];
+            };
+            
+            // Save to global list to prevent GC
+            activeUtterances.push(msg);
+            window.activeUtterancesList = activeUtterances;
+            
+            window.speechSynthesis.speak(msg);
+        }
+        
+        function dismissToast() {
+            toast.classList.remove('ai-voice-toast-visible');
+            setTimeout(function() {
+                toast.style.display = 'none';
+            }, 600);
+        }
+        
+        // Listeners for Toast
+        playBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            handleSpeech();
+        });
+        
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            greetingDone = true;
+            sessionStorage.setItem('plantAiVoiceGreetingPlayed', 'true');
+            dismissToast();
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+        });
+        
+        // Global document triggers
+        document.addEventListener('click', handleSpeech);
+        document.addEventListener('keydown', handleSpeech);
+        
+        // Re-check voices when loaded dynamically
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = function() {
+                window.speechSynthesis.getVoices();
+            };
+        }
     }
-    document.addEventListener('click', speakGreeting, { once: true });
-    document.addEventListener('keydown', speakGreeting, { once: true });
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initVoice);
+    } else {
+        initVoice();
+    }
 })();
 </script>
 </body>
