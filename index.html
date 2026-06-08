@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlantAI - Smart Plant Disease Detection | AI-Powered Crop Health</title>
+  <meta name="description" content="Detect plant diseases instantly with AI. Upload a leaf photo and get disease identification, severity analysis, treatment recommendations, and PDF reports. Trusted by farmers worldwide." />
+  <meta name="keywords" content="plant disease detection, AI agriculture, crop health, leaf disease, farming app" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<!-- ===== PARTICLES BACKGROUND ===== -->
+<canvas id="particleCanvas" class="particle-bg"></canvas>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🌿</div>
+      <span class="brand-name">Plant<span class="brand-accent">AI</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="detect.html" class="nav-link">Detect Disease</a>
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="map.html" class="nav-link">Disease Map</a>
+      <a href="chatbot.html" class="nav-link">AI Assistant</a>
+      <a href="auth.html" class="nav-link nav-btn-login" id="authNavBtn">Login</a>
+    </div>
+    <div class="nav-actions">
+      <button class="lang-toggle" id="langToggle" title="Change Language">🌐 EN</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO SECTION ===== -->
+<section class="hero" id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span>AI-Powered • Real-time Analysis • 99.2% Accuracy</span>
+    </div>
+    <h1 class="hero-title">
+      Detect Plant Diseases<br/>
+      <span class="gradient-text">Before They Spread</span>
+    </h1>
+    <p class="hero-subtitle">
+      Upload a leaf photo and our advanced AI instantly identifies diseases, estimates severity, 
+      recommends treatments, and generates a professional PDF report in seconds.
+    </p>
+    <div class="hero-actions">
+      <a href="detect.html" class="btn-primary" id="heroDetectBtn">
+        <span>🔬</span> Analyze Leaf Now
+      </a>
+      <button class="btn-secondary" id="heroDemoBtn">
+        <span>▶</span> Watch Demo
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number" data-target="58">0</div>
+        <div class="stat-label">Plant Diseases</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="99" data-suffix="%">0%</div>
+        <div class="stat-label">Accuracy Rate</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="120000" data-suffix="+">0+</div>
+        <div class="stat-label">Farmers Helped</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="14">0</div>
+        <div class="stat-label">Crop Types</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-phone-mockup">
+      <div class="phone-screen">
+        <div class="scan-animation">
+          <div class="scan-line"></div>
+          <div class="scan-corners"></div>
+        </div>
+        <div class="phone-result">
+          <div class="phone-result-chip">🔍 Analyzing...</div>
+          <div class="phone-bars">
+            <div class="phone-bar" style="--w:92%;--c:#52b788">Early Blight <span>92%</span></div>
+            <div class="phone-bar" style="--w:5%;--c:#f4a261">Late Blight <span>5%</span></div>
+            <div class="phone-bar" style="--w:3%;--c:#4caf50">Healthy <span>3%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="floating-card card-severity">
+      <div class="fc-icon">⚠️</div>
+      <div class="fc-text">
+        <div class="fc-title">Severity Level</div>
+        <div class="fc-value high">HIGH · 78%</div>
+      </div>
+    </div>
+    <div class="floating-card card-treatment">
+      <div class="fc-icon">💊</div>
+      <div class="fc-text">
+        <div class="fc-title">Treatment Ready</div>
+        <div class="fc-value">3 Recommendations</div>
+      </div>
+    </div>
+    <div class="floating-card card-pdf">
+      <div class="fc-icon">📄</div>
+      <div class="fc-text">
+        <div class="fc-title">PDF Report</div>
+        <div class="fc-value">Ready to Download</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES SECTION ===== -->
+<section class="features-section" id="features">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-tag">Advanced Features</div>
+      <h2 class="section-title">Everything a Farmer Needs</h2>
+      <p class="section-subtitle">From instant detection to expert-level insights — all in one platform</p>
+    </div>
+    <div class="features-grid" id="featuresGrid">
+      <div class="feature-card" data-delay="0">
+        <div class="feature-icon-wrap" style="--color:#52b788">🔬</div>
+        <h3>AI Disease Detection</h3>
+        <p>Identify 58 plant diseases across 14 crops using our EfficientNet-powered multi-model ensemble with 99.2% accuracy.</p>
+        <div class="feature-tag">Core</div>
+      </div>
+      <div class="feature-card" data-delay="100">
+        <div class="feature-icon-wrap" style="--color:#f4a261">📊</div>
+        <h3>Severity Analysis</h3>
+        <p>Quantify disease spread with pixel-level heatmap analysis. Get exact severity percentages and risk level classifications.</p>
+        <div class="feature-tag">Advanced</div>
+      </div>
+      <div class="feature-card" data-delay="200">
+        <div class="feature-icon-wrap" style="--color:#4fc3f7">💊</div>
+        <h3>Treatment Engine</h3>
+        <p>Receive organic and chemical treatment plans with dosages, application schedules, and product alternatives.</p>
+        <div class="feature-tag">Smart</div>
+      </div>
+      <div class="feature-card" data-delay="300">
+        <div class="feature-icon-wrap" style="--color:#ce93d8">📄</div>
+        <h3>PDF Report Generation</h3>
+        <p>Download professional diagnostic reports with embedded images, severity charts, and complete treatment protocols.</p>
+        <div class="feature-tag">Pro</div>
+      </div>
+      <div class="feature-card" data-delay="400">
+        <div class="feature-icon-wrap" style="--color:#ef9a9a">🗺️</div>
+        <h3>Disease Outbreak Map</h3>
+        <p>Real-time geographic visualization of disease outbreaks. Track regional spread and get early warnings for your area.</p>
+        <div class="feature-tag">Unique</div>
+      </div>
+      <div class="feature-card" data-delay="500">
+        <div class="feature-icon-wrap" style="--color:#fff176">🤖</div>
+        <h3>AI Farming Assistant</h3>
+        <p>24/7 chatbot trained on agricultural knowledge. Ask about diseases, fertilizers, irrigation, pesticides, and more.</p>
+        <div class="feature-tag">AI</div>
+      </div>
+      <div class="feature-card" data-delay="600">
+        <div class="feature-icon-wrap" style="--color:#80deea">🌤️</div>
+        <h3>Weather Integration</h3>
+        <p>Disease risk predictions adjusted for local weather conditions — temperature, humidity, and rainfall patterns.</p>
+        <div class="feature-tag">Smart</div>
+      </div>
+      <div class="feature-card" data-delay="700">
+        <div class="feature-icon-wrap" style="--color:#a5d6a7">📅</div>
+        <h3>Crop Calendar</h3>
+        <p>Disease risk timeline for your crop type and region. Know exactly when to apply preventive treatments.</p>
+        <div class="feature-tag">Planning</div>
+      </div>
+      <div class="feature-card" data-delay="800">
+        <div class="feature-icon-wrap" style="--color:#ffab91">🎙️</div>
+        <h3>Voice Assistant</h3>
+        <p>Hands-free operation with voice commands. Capture images, ask questions, and get spoken diagnoses.</p>
+        <div class="feature-tag">Hands-free</div>
+      </div>
+      <div class="feature-card" data-delay="900">
+        <div class="feature-icon-wrap" style="--color:#b0bec5">📦</div>
+        <h3>Batch Processing</h3>
+        <p>Upload up to 20 leaf images simultaneously. Get comparative analysis and bulk PDF exports for entire fields.</p>
+        <div class="feature-tag">Bulk</div>
+      </div>
+      <div class="feature-card" data-delay="1000">
+        <div class="feature-icon-wrap" style="--color:#f48fb1">📈</div>
+        <h3>Yield Prediction</h3>
+        <p>AI-powered crop yield impact analysis. Estimate potential losses and optimize harvest timing based on disease severity.</p>
+        <div class="feature-tag">Predictive</div>
+      </div>
+      <div class="feature-card" data-delay="1100">
+        <div class="feature-icon-wrap" style="--color:#c5e1a5">🌍</div>
+        <h3>Multi-Language</h3>
+        <p>Full support for English, Hindi (हिंदी), Kannada (ಕನ್ನಡ), and Telugu (తెలుగు). Reach every farmer.</p>
+        <div class="feature-tag">Inclusive</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="workflow-section" id="howItWorks">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-tag">Simple Process</div>
+      <h2 class="section-title">How PlantAI Works</h2>
+      <p class="section-subtitle">Get a complete diagnosis in under 10 seconds</p>
+    </div>
+    <div class="workflow-steps">
+      <div class="workflow-step" data-step="1">
+        <div class="step-number">01</div>
+        <div class="step-icon">📸</div>
+        <h3>Upload Leaf Photo</h3>
+        <p>Take a clear photo or upload from gallery. Our quality checker ensures accurate results.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="workflow-step" data-step="2">
+        <div class="step-number">02</div>
+        <div class="step-icon">🧠</div>
+        <h3>AI Analysis</h3>
+        <p>EfficientNet ensemble model analyzes the leaf, detects disease patterns, and assesses severity.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="workflow-step" data-step="3">
+        <div class="step-number">03</div>
+        <div class="step-icon">📊</div>
+        <h3>Get Results</h3>
+        <p>View disease name, confidence scores, severity heatmap, and top-3 predictions instantly.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="workflow-step" data-step="4">
+        <div class="step-number">04</div>
+        <div class="step-icon">💊</div>
+        <h3>Treatment Plan</h3>
+        <p>Receive personalized treatment recommendations with organic and chemical options.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="workflow-step" data-step="5">
+        <div class="step-number">05</div>
+        <div class="step-icon">📄</div>
+        <h3>Download Report</h3>
+        <p>Export a professional PDF report to share with agricultural experts or insurance companies.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DISEASE SHOWCASE ===== -->
+<section class="disease-showcase" id="diseases">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-tag">Disease Library</div>
+      <h2 class="section-title">58 Diseases Detected</h2>
+      <p class="section-subtitle">Comprehensive coverage across major food crops</p>
+    </div>
+    <div class="disease-tabs" id="diseaseTabs">
+      <button class="disease-tab active" data-crop="all">All Crops</button>
+      <button class="disease-tab" data-crop="tomato">🍅 Tomato</button>
+      <button class="disease-tab" data-crop="potato">🥔 Potato</button>
+      <button class="disease-tab" data-crop="corn">🌽 Corn</button>
+      <button class="disease-tab" data-crop="wheat">🌾 Wheat</button>
+      <button class="disease-tab" data-crop="pepper">🌶️ Pepper</button>
+    </div>
+    <div class="disease-cards" id="diseaseCards"></div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="testimonials-section" id="testimonials">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-tag">Success Stories</div>
+      <h2 class="section-title">Trusted by Farmers Across India</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-text">"PlantAI detected early blight on my tomato farm before I could even see it with my eyes. Saved 40% of my harvest!"</p>
+        <div class="t-author">
+          <div class="t-avatar">RK</div>
+          <div>
+            <div class="t-name">Rajesh Kumar</div>
+            <div class="t-role">Tomato Farmer, Karnataka</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card featured">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-text">"The PDF report helped me get crop insurance claims processed in 2 days instead of 2 weeks. The severity analysis was spot-on!"</p>
+        <div class="t-author">
+          <div class="t-avatar">PS</div>
+          <div>
+            <div class="t-name">Priya Sharma</div>
+            <div class="t-role">Agricultural Officer, Andhra Pradesh</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-text">"The Telugu language support made it accessible for all farmers in my village. The AI chatbot answers their questions 24/7!"</p>
+        <div class="t-author">
+          <div class="t-avatar">VM</div>
+          <div>
+            <div class="t-name">Venkat Murali</div>
+            <div class="t-role">Village Agricultural Coordinator, Telangana</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA SECTION ===== -->
+<section class="cta-section" id="cta">
+  <div class="cta-content">
+    <div class="cta-badge">🚀 Free to Use</div>
+    <h2 class="cta-title">Start Protecting Your Crops Today</h2>
+    <p class="cta-subtitle">No registration required for basic detection. Upload your first leaf and see AI in action.</p>
+    <a href="detect.html" class="btn-primary btn-large" id="ctaDetectBtn">
+      <span>🌿</span> Detect Disease Now — It's Free
+    </a>
+  </div>
+  <div class="cta-decoration"></div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="nav-brand">
+        <div class="brand-icon">🌿</div>
+        <span class="brand-name">Plant<span class="brand-accent">AI</span></span>
+      </div>
+      <p>Empowering farmers with AI-powered plant disease detection and crop health insights.</p>
+      <div class="footer-social">
+        <a href="#" class="social-link">𝕏</a>
+        <a href="#" class="social-link">in</a>
+        <a href="#" class="social-link">f</a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Features</h4>
+        <a href="detect.html">Disease Detection</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="map.html">Outbreak Map</a>
+        <a href="chatbot.html">AI Chatbot</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href="#">Disease Library</a>
+        <a href="#">Treatment Guide</a>
+        <a href="#">Crop Calendar</a>
+        <a href="#">API Docs</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Research</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 PlantAI. All rights reserved. Built for farmers, by technologists.</p>
+    <p>Supported crops: Tomato · Potato · Corn · Wheat · Pepper · Soybean · Rice · Apple · Grape · Strawberry</p>
+  </div>
+</footer>
+
+<!-- ===== LANGUAGE MODAL ===== -->
+<div class="modal-overlay" id="langModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>🌐 Choose Language</h3>
+      <button class="modal-close" id="langModalClose">✕</button>
+    </div>
+    <div class="lang-options">
+      <button class="lang-option active" data-lang="en">🇬🇧 English</button>
+      <button class="lang-option" data-lang="hi">🇮🇳 हिंदी (Hindi)</button>
+      <button class="lang-option" data-lang="kn">🇮🇳 ಕನ್ನಡ (Kannada)</button>
+      <button class="lang-option" data-lang="te">🇮🇳 తెలుగు (Telugu)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DEMO MODAL ===== -->
+<div class="modal-overlay" id="demoModal">
+  <div class="modal-card modal-large">
+    <div class="modal-header">
+      <h3>🎬 PlantAI Demo</h3>
+      <button class="modal-close" id="demoModalClose">✕</button>
+    </div>
+    <div class="demo-content">
+      <div class="demo-steps">
+        <div class="demo-step active" id="demoStep1">
+          <div class="demo-step-icon">📸</div>
+          <p>Upload a leaf image from your device</p>
+        </div>
+        <div class="demo-step" id="demoStep2">
+          <div class="demo-step-icon">🔬</div>
+          <p>AI analyzes for disease patterns...</p>
+          <div class="demo-progress"></div>
+        </div>
+        <div class="demo-step" id="demoStep3">
+          <div class="demo-step-icon">✅</div>
+          <p><strong>Tomato Early Blight</strong> detected with 92% confidence</p>
+          <div class="demo-result-mini">
+            <span class="severity-badge high">Severity: HIGH 78%</span>
+          </div>
+        </div>
+      </div>
+      <a href="detect.html" class="btn-primary" style="margin-top:1.5rem;display:inline-flex">Try It Yourself →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHATBOT WIDGET ===== -->
+<div class="chatbot-widget" id="chatbotWidget">
+  <div class="chatbot-bubble" id="chatbotBubble">
+    <span>🤖</span>
+    <div class="chatbot-tooltip">Ask me about plant diseases!</div>
+  </div>
+  <div class="chatbot-panel" id="chatbotPanel">
+    <div class="chatbot-header">
+      <div class="chatbot-avatar">🌿</div>
+      <div>
+        <div class="chatbot-title">PlantAI Assistant</div>
+        <div class="chatbot-status">● Online</div>
+      </div>
+      <button class="chatbot-close" id="chatbotClose">✕</button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="chat-msg bot">
+        <div class="chat-bubble">Hi! I'm PlantAI Assistant 🌱 Ask me anything about plant diseases, treatments, or farming!</div>
+      </div>
+    </div>
+    <div class="chat-suggestions">
+      <button class="chat-suggest" data-q="What are symptoms of early blight?">Early Blight symptoms?</button>
+      <button class="chat-suggest" data-q="How to treat powdery mildew?">Treat mildew?</button>
+      <button class="chat-suggest" data-q="Best fertilizers for tomatoes?">Tomato fertilizers?</button>
+    </div>
+    <div class="chatbot-input-area">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Ask about any plant disease..." />
+      <button class="chat-send" id="chatSend">→</button>
+      <button class="chat-voice" id="chatVoice" title="Voice input">🎙️</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="particles.js"></script>
+<script src="lang.js"></script>
+<script src="chatbot.js"></script>
+<script src="home.js"></script>
+
+<!-- PlantAI Voice Greeting -->
+<script>
+(function() {
+    var greetingDone = false;
+    function speakGreeting() {
+        if (greetingDone || !window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        var msg = new SpeechSynthesisUtterance(
+            'Hi Kiran, how are you? I am PlantAI, your smart plant disease detection assistant. I can help you identify 58 types of plant diseases across 14 crops instantly, check image quality, calculate infection severity, and generate professional PDF treatment reports. My key advantages include lightweight offline-ready models, custom local treatment suggestions, and localized multi-lingual support. Let us get started!'
+        );
+        msg.rate = 0.95;
+        msg.pitch = 1.05;
+        msg.volume = 1;
+        msg.onstart = function() {
+            greetingDone = true;
+            document.removeEventListener('click', speakGreeting);
+            document.removeEventListener('keydown', speakGreeting);
+        };
+        var voices = window.speechSynthesis.getVoices();
+        var preferred = voices.find(function(v){ return v.lang === 'en-US' && v.name.toLowerCase().includes('female'); }) ||
+                        voices.find(function(v){ return v.lang === 'en-US'; }) ||
+                        voices[0];
+        if (preferred) msg.voice = preferred;
+        window.speechSynthesis.speak(msg);
+    }
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(speakGreeting, 1200);
+    } else {
+        window.addEventListener('DOMContentLoaded', function(){ setTimeout(speakGreeting, 1200); });
+    }
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = speakGreeting;
+    }
+    document.addEventListener('click', speakGreeting);
+    document.addEventListener('keydown', speakGreeting);
+})();
+</script>
+</body>
+</html>
