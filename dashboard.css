@@ -1,0 +1,285 @@
+/* ================================================
+   PlantAI - Dashboard Page Styles
+   ================================================ */
+
+.dashboard-wrapper {
+  min-height: calc(100vh - var(--navbar-h) - 100px);
+  padding: calc(var(--navbar-h) + 2rem) 2rem 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Header Banner ── */
+.db-header-banner {
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.user-greeting h1 {
+  font-size: 2rem;
+  color: var(--primary-light);
+  margin-bottom: 0.5rem;
+}
+
+.user-greeting p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.db-quick-stats {
+  display: flex;
+  gap: 2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem 2rem;
+  border-radius: var(--radius-lg);
+}
+
+.db-quick-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 110px;
+}
+
+.db-stat-num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: var(--font-display);
+}
+
+.db-stat-num.color-danger {
+  color: var(--danger);
+}
+
+.db-stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+/* Divider for stats */
+.db-quick-item:not(:last-child) {
+  border-right: 1px solid var(--border);
+  padding-right: 2rem;
+}
+
+/* ── Analytics Grid ── */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+}
+
+.analytics-card {
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+}
+
+.analytics-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.chart-container {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+/* ── History Panel ── */
+.history-panel {
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+}
+
+.hp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+
+.hp-header h3 {
+  font-size: 1.25rem;
+  color: var(--primary-light);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+.history-empty-icon {
+  font-size: 3rem;
+  opacity: 0.4;
+  margin-bottom: 1rem;
+}
+
+.history-empty h4 {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.color-primary {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* History Card */
+.history-card {
+  background: rgba(12, 26, 46, 0.4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+  gap: 1.5rem;
+}
+
+.history-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--primary);
+}
+
+.hc-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.hc-icon {
+  font-size: 2rem;
+  background: var(--bg-surface);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+}
+
+.hc-info h4 {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.hc-info p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.hc-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.hc-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.hc-metric-val {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.hc-metric-val.high { color: var(--warning); }
+.hc-metric-val.critical { color: var(--danger); }
+.hc-metric-val.medium { color: #ffd700; }
+.hc-metric-val.low { color: var(--primary); }
+
+.hc-metric-lbl {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.btn-view-report {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--primary-light);
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn-view-report:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+  .db-header-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .db-quick-stats {
+    width: 100%;
+    justify-content: space-around;
+  }
+}
+
+@media (max-width: 600px) {
+  .db-quick-stats {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  .db-quick-item:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-right: 0;
+    padding-bottom: 1rem;
+    width: 100%;
+  }
+  .history-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .hc-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
